@@ -1,0 +1,28 @@
+# QUESTION 2
+from scipy.ndimage.interpolation import shift
+def shift_image(image, dx, dy):
+  image = image.reshape(28,28)
+  shifted_image = shift(image, [dx,dy], mode='constant', cval=0)
+  return shifted_image.reshape([-1])
+
+x_train_aug = x_train
+y_train_aug = y_train
+
+for dx, dy in ((-1,0),(1,0),(0,-1),(0,1)):
+  for image, label in x_train, y_train:
+    x_train_aug.append(shift_image(image, dx, dy))
+    y_train_aug.append(label)
+
+x_train_aug = np.array(x_train_aug)
+y_train_aug = np.array(y_train_aug)
+
+shuffle_indices = np.random.permutation(len(x_train_aug))
+
+x_train_aug = x_train_aug[shuffle_indices]
+y_train_aug = y_train_aug[shuffle_indices]
+
+knnclf_best_params = KNeighborsClassifier(**gscv.best_params_)
+knnclf_best_params(x_train_aug, y_train_aug)
+y_pred_optimised = knnclf_best_params.predict(x_test)
+
+accuracy_score(y_test, y_pred_optimised)
